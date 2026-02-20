@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getHuggingFaceUrl, buildEmojiPrompt, API_CONFIG } from "@/lib/api-config";
 
 export async function POST(request: NextRequest) {
-  if (!process.env.HF_TOKEN) {
+  const token = process.env.HF_TOKEN;
+  
+  if (!token) {
     return NextResponse.json(
       { error: "HF_TOKEN is not configured" },
       { status: 500 }
@@ -9,7 +12,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { prompt } = await request.json();
+    const body = await request.json();
+    const { prompt } = body;
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -18,25 +22,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emojiPrompt = `${prompt}, emoji style, cute emoticon, simple rounded shapes, bright colors, kawaii, flat design, solid color background`;
+    const emojiPrompt = buildEmojiPrompt(prompt);
+    const { defaultWidth, defaultHeight } = API_CONFIG.huggingFace;
 
-    const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.HF_TOKEN}`,
-          "Content-Type": "application/json",
+    const response = await fetch(getHuggingFaceUrl(), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: emojiPrompt,
+        parameters: {
+          width: defaultWidth,
+          height: defaultHeight,
         },
-        body: JSON.stringify({
-          inputs: emojiPrompt,
-          parameters: {
-            width: 512,
-            height: 512,
-          },
-        }),
-      }
-    );
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();

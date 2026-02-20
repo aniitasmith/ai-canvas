@@ -1,40 +1,110 @@
-# AI Canvas
+# Emoji Canvas Generator
 
-Generate stunning images with AI. Enter a text prompt and create visuals instantly using Stable Diffusion XL.
+A creative web application for generating emoji-style images using AI and composing them on an interactive canvas.
 
 ## Features
 
-- **Text-to-Image** - Describe what you want to see
-- **SDXL Model** - High-quality image generation via Replicate
-- **Download** - Save generated images directly
-- **Real-time Status** - See generation progress
+### AI Image Generation
+- Generate cute emoji-style images from text descriptions
+- Powered by Hugging Face's FLUX.1-schnell model
+- Automatic prompt enhancement for consistent emoji aesthetics
+
+### Interactive Canvas
+- **Infinite pan and zoom** - Navigate freely across your canvas
+- **Multi-tool support** - Select, pan, draw, add text
+- **Shapes** - Add rectangles, circles, and triangles
+- **Freehand drawing** - Draw with customizable brush color and size
+- **Text tool** - Add text with adjustable color and size
+- **Layer management** - Bring forward, send backward, bring to front, send to back
+
+### Editing Features
+- **Undo/Redo** - Full history support with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- **Object manipulation** - Move, scale, and rotate any element
+- **Object boundaries** - Elements stay within the visible canvas
+- **Delete** - Remove selected elements (Delete/Backspace key)
+- **Clear all** - Start fresh with one click
+- **Export** - Download your creation as PNG
 
 ## Tech Stack
 
-- Next.js 16
-- TypeScript
-- Tailwind CSS
-- Replicate API (SDXL)
+- **Framework**: Next.js 14 (App Router)
+- **Canvas**: Fabric.js
+- **Styling**: Tailwind CSS
+- **AI**: Hugging Face Inference API
+- **Language**: TypeScript
 
 ## Getting Started
 
-1. Get your API token from [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens)
+### Prerequisites
+- Node.js 18+
+- Hugging Face account and API token
 
-2. Create a `.env` file:
-```
-REPLICATE_API_TOKEN=your_token_here
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ai-canvas.git
+cd ai-canvas
 ```
 
-3. Install and run:
+2. Install dependencies:
 ```bash
 npm install
+```
+
+3. Create environment file:
+```bash
+cp .env.example .env
+```
+
+4. Add your Hugging Face token to `.env`:
+```
+HF_TOKEN=your_huggingface_token_here
+```
+
+5. Start the development server:
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. Open [http://localhost:3000](http://localhost:3000)
 
-## Live Demo
+## Project Structure
 
-[ai-canvas-seven.vercel.app](https://ai-canvas-seven.vercel.app)
+```
+ai-canvas/
+├── app/
+│   ├── api/generate/     # AI image generation endpoint
+│   ├── page.tsx          # Main application page
+│   └── layout.tsx        # App layout
+├── components/
+│   ├── Canvas.tsx        # Main Fabric.js canvas component
+│   ├── PromptInput.tsx   # AI prompt input component
+│   ├── ActionBar.tsx     # Bottom action bar
+│   ├── icons/            # Centralized SVG icons
+│   └── toolbar/          # Toolbar components
+│       ├── Toolbar.tsx
+│       ├── ToolButton.tsx
+│       ├── ShapesMenu.tsx
+│       ├── ColorSizeControls.tsx
+│       ├── LayerControls.tsx
+│       ├── HistoryControls.tsx
+│       ├── LoadingOverlay.tsx
+│       ├── types.ts
+│       └── constants.ts
+└── lib/
+    └── api-config.ts     # API configuration and utilities
+```
 
-> Note: The live demo requires a valid Replicate API token configured in Vercel environment variables.
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl/Cmd + Z | Undo |
+| Ctrl/Cmd + Y | Redo |
+| Ctrl/Cmd + Shift + Z | Redo |
+| Delete / Backspace | Delete selected |
+
+## License
+
+MIT
