@@ -12,11 +12,11 @@ import {
   FabricObject,
   Point,
 } from "fabric";
-
-type TMat2D = [number, number, number, number, number, number];
 import { Toolbar, LoadingOverlay } from "./toolbar";
 import { Tool, ShapeType } from "./toolbar/types";
 import { CANVAS_BACKGROUND_COLOR, MAX_HISTORY_LENGTH } from "./toolbar/constants";
+
+type TMat2D = [number, number, number, number, number, number];
 
 interface CanvasProps {
   imageUrl: string | null;
