@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import Replicate from "replicate";
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
 
 export async function POST(request: NextRequest) {
-  if (!process.env.REPLICATE_API_TOKEN) {
+  if (!process.env.HF_TOKEN) {
     return NextResponse.json(
-      { error: "REPLICATE_API_TOKEN is not configured" },
+      { error: "HF_TOKEN is not configured" },
       { status: 500 }
     );
   }
@@ -23,27 +18,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+    const emojiPrompt = `${prompt}, emoji style, cute emoticon, simple rounded shapes, bright colors, kawaii, flat design, solid color background`;
+
+    const response = await fetch(
+      "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
       {
-        input: {
-          prompt: prompt,
-          width: 1024,
-          height: 1024,
-          num_outputs: 1,
-          scheduler: "K_EULER",
-          num_inference_steps: 25,
-          guidance_scale: 7.5,
-          prompt_strength: 0.8,
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.HF_TOKEN}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          inputs: emojiPrompt,
+          parameters: {
+            width: 512,
+            height: 512,
+          },
+        }),
       }
     );
 
-    const imageUrl = Array.isArray(output) ? output[0] : output;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Hugging Face API error:", response.status, errorText);
+      return NextResponse.json(
+        { error: `API error: ${response.status}` },
+        { status: response.status }
+      );
+    }
+
+    const imageBuffer = await response.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString("base64");
+    const imageUrl = `data:image/png;base64,${base64Image}`;
 
     return NextResponse.json({ imageUrl });
   } catch (error) {
-    console.error("Replicate error:", error);
+    console.error("Generation error:", error);
     return NextResponse.json(
       { error: "Failed to generate image" },
       { status: 500 }
